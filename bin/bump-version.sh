@@ -63,14 +63,13 @@ main() {
 			exit 0
 		fi
 		new_version="0.1.0"
-		commit_message="add VERSION file, version bump to v0.1.0"
+		commit_message="add VERSION file, version bump to $new_version"
 	fi
 
 
 	log "new version will be set to '$new_version'"
 
-	# write new version to file
-	echo "$new_version" > ${version_file}
+	write_new_version "$version_file" "$new_version"
 
 	submit_new_version "$version_file" "$commit_message" "$new_version"
 }
@@ -103,6 +102,11 @@ get_suggested_version() {
 	v_patch=0
 	
 	echo "$v_major.$v_minor.$v_patch"
+}
+
+write_new_version() {
+	local version_file="$1"; local new_version="$2"
+	echo "$new_version" > ${version_file}
 }
 
 submit_new_version() {
