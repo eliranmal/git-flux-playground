@@ -13,64 +13,30 @@
 
 
 main() {
+	local commit_message; local commit_message_template; local new_version; local suggested_version
 
 	local source_dir="$( cd "$(dirname "${BASH_SOURCE}")" ; pwd -P )"
 	local version_file=${source_dir}/../VERSION
 
-#	if [[ -f $version_file ]]; then
-#		local base_string="$(cat ${version_file})"
-#		local curr_ver_list=($(echo "$base_string" | tr '.' ' '))
-#		local v_major=${curr_ver_list[0]}
-#		local v_minor=${curr_ver_list[1]}
-#		local v_patch=${curr_ver_list[2]}
-#		log "current version : $base_string"
-#		v_minor=$((v_minor + 1))
-#		v_patch=0
-#		local suggested_version="$v_major.$v_minor.$v_patch"
-#		read -r -p "$(log "enter a version string [$suggested_version]: ")" input_version
-#		if [[ -z $input_version ]]; then
-#			input_version="$suggested_version"
-#		fi
-#		log "new version will be set to '$input_version'"
-#		echo "$input_version" > ${version_file}
-#		git add ${version_file}
-#		git commit -m "version bump to $input_version"
-#		git tag -a -m "tagging version $input_version" "v$input_version"
-#		git push origin --tags
-#	else
-#		echo "could not find a VERSION file"
-#		read -p "$(log "do you want to create a version file and start from scratch? [y] ")" input_create_version_file
-#		if [[ $input_create_version_file = "y" ]]; then
-#			echo "0.1.0" > ${version_file}
-#			git add ${version_file}
-#			git commit -m "add VERSION file, version bump to v0.1.0"
-#			git tag -a -m "tagging version 0.1.0" "v0.1.0"
-#			git push origin --tags
-#		fi
-#
-#	fi
-
-
-	local commit_message
-	local new_version
-
-
 	if [[ -f $version_file ]]; then
-        new_version="$(prompt_new_version)"
-		commit_message="version bump to $new_version"
+        local current_version="$(get_current_version ${version_file})"
+		log "current version : $current_version"
+		
+		suggested_version="$(get_suggested_version "$current_version")"
+		commit_message_template="version bump to %s"
 	else
 		if ! confirm_init_version; then
 			exit 0
 		fi
-		new_version="0.1.0"
-		commit_message="add VERSION file, version bump to $new_version"
+		suggested_version="0.1.0"
+		commit_message_template="add VERSION file, initial version is %s"
 	fi
 
+	new_version="$(prompt_new_version "$suggested_version")"
+	commit_message="$(printf "$commit_message_template" "$new_version")"
 
 	log "new version will be set to '$new_version'"
-
 	write_new_version "$version_file" "$new_version"
-
 	submit_new_version "$version_file" "$commit_message" "$new_version"
 }
 
@@ -81,10 +47,8 @@ confirm_init_version() {
 }
 
 prompt_new_version() {
-	local current_version="$(get_current_version ${version_file})"
-	log "current version : $current_version"
-	local suggested_version="$(get_suggested_version "$current_version")"
-	read -r -p "$(log "enter a version string [$suggested_version]: ")" input_version
+	local suggested_version="$1"
+	read -r -p "$(log "enter the new version [$suggested_version]: ")" input_version
 	echo "${input_version:-$suggested_version}"
 }
 
@@ -95,8 +59,8 @@ get_current_version() {
 
 get_suggested_version() {
 	local current_version="$1"
-	local curr_ver_list=($(echo "$current_version" | tr '.' ' '))
-	local v_major=${curr_ver_list[0]}; local v_minor=${curr_ver_list[1]}; local v_patch=${curr_ver_list[2]}
+	local v_segments=($(echo "$current_version" | tr '.' ' '))
+	local v_major=${v_segments[0]}; local v_minor=${v_segments[1]}; local v_patch=${v_segments[2]}
 
 	v_minor=$((v_minor + 1))
 	v_patch=0
