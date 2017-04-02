@@ -21,8 +21,10 @@ main() {
 	local commit_message="$(printf "$commit_message_template" "$new_version")"
 
 	log "new version will be set to '$new_version'"
-	write_version_file "$new_version"
-	publish_version "$commit_message" "$new_version"
+	sed -i '' 's,@@VERSION@@,'"$new_version"',g' $(git rev-parse --show-toplevel)/stuff*
+
+#	write_version_file "$new_version"
+#	publish_version "$commit_message" "$new_version"
 }
 
 usage() {
