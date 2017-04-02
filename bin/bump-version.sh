@@ -94,6 +94,7 @@ increment_version() {
 
 publish_version() {
 	local commit_message="$1"; local version="$2"
+	git add ${VERSION_FILE}
 	git commit --only -m "$commit_message" -- ${VERSION_FILE}
 	git tag -a -m "tagging version $version" "v$version"
 	git push origin --tags
