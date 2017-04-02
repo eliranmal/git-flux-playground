@@ -10,26 +10,38 @@ main() {
 			usage
 			;;
 	esac
+	
+	local bump_segment="$1"
 
 	local current_version="$(get_current_version)"
 	log "current version: ${current_version:-[none]}"
 
 	local commit_message_template="$(get_commit_message_template "$current_version")"
-	local suggested_version="$(get_suggested_version "$current_version")"
+	local suggested_version="$(get_suggested_version "$current_version" "$bump_segment")"
 
 	local new_version="$(prompt_new_version "$suggested_version")"
 	local commit_message="$(printf "$commit_message_template" "$new_version")"
 
 	log "new version will be set to '$new_version'"
-	sed -i '' 's,@@VERSION@@,'"$new_version"',g' $(git rev-parse --show-toplevel)/stuff*
+	write_version_file "$new_version"
+	publish_version "$commit_message" "$new_version"
 
-#	write_version_file "$new_version"
-#	publish_version "$commit_message" "$new_version"
+
+#
+# todo - this is an example invocation
+#	env VERSION_FILE=${source_dir}/../git-flux-playground-version \
+#		REPLACE_FILES="$(git rev-parse --show-toplevel)/stuff-* $(git rev-parse --show-toplevel)/stuff" \
+#		${source_dir}/bump-version.sh
+#
+# todo - do this in the setup process, read new_version from version file
+#	if [[ $REPLACE_FILES ]]; then
+#		sed -i '' 's,@@VERSION@@,'"$new_version"',g' ${REPLACE_FILES}
+#	fi
 }
 
 usage() {
 	echo "
-usage: [environment] bump-version.sh
+usage: [environment] bump-version.sh [major|minor|patch]
 environment:
    VERSION_FILE=$VERSION_FILE
 "
@@ -62,20 +74,14 @@ get_commit_message_template() {
 }
 
 get_suggested_version() {
-	local current_version="$1"
+	local current_version="$1"; local bump_segment="$2"
 	local suggested_version
 	if [[ $current_version ]]; then
-		suggested_version="$(increment_version "$current_version")"
+		suggested_version="$(increment_version "$current_version" "$bump_segment")"
 	else
 		suggested_version="0.1.0"
 	fi
 	printf "%s" "$suggested_version"
-}
-
-prompt_new_version() {
-	local suggested_version="$1"
-	read -r -p "$(log "enter the new version [$suggested_version]: ")" answer
-	echo "${answer:-$suggested_version}"
 }
 
 increment_version() {
@@ -92,6 +98,12 @@ increment_version() {
 	fi
 	
 	echo "$v_major.$v_minor.$v_patch"
+}
+
+prompt_new_version() {
+	local suggested_version="$1"
+	read -r -p "$(log "enter the new version [$suggested_version]: ")" answer
+	echo "${answer:-$suggested_version}"
 }
 
 publish_version() {
