@@ -25,18 +25,6 @@ main() {
 	log "new version will be set to '$new_version'"
 	write_version_file "$new_version"
 	publish_version "$commit_message" "$new_version"
-
-
-#
-# todo - this is an example invocation
-#	env VERSION_FILE=${source_dir}/../git-flux-playground-version \
-#		REPLACE_FILES="$(git rev-parse --show-toplevel)/stuff-* $(git rev-parse --show-toplevel)/stuff" \
-#		${source_dir}/bump-version.sh
-#
-# todo - do this in the setup process, read new_version from version file
-#	if [[ $REPLACE_FILES ]]; then
-#		sed -i '' 's,@@VERSION@@,'"$new_version"',g' ${REPLACE_FILES}
-#	fi
 }
 
 usage() {
