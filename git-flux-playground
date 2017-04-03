@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+
+main() {
+	local source_dir="$( cd "$(dirname "${BASH_SOURCE}")" ; pwd -P )"
+
+	source ${source_dir}/git-flux-playground-manifest
+	source ${source_dir}/git-flux-playground-src
+	
+	if [[ $1 ]]; then
+		cmd_$1
+	fi
+}
+
+
+main "$@"

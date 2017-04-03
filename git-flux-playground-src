@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+
+cmd_src() {
+	echo "cmd_src called"
+	echo "VERSION: $VERSION"
+}
