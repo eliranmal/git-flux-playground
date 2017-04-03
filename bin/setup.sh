@@ -8,7 +8,7 @@ main() {
 
 	env OUTPUT_FILE=${root_dir}/gitflux-playground-manifest ${source_dir}/render-manifest.sh
 
-	rm -v ${root_dir}/ext/*
+	rm -v ${install_dir}/*
 	cp -v ${root_dir}/git-flux-playground* ${install_dir}
 	cp -v ${root_dir}/gitflux-playground* ${install_dir}
 	

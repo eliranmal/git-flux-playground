@@ -4,7 +4,7 @@
 main() {
 	local source_dir="$( cd "$(dirname "${BASH_SOURCE}")" ; pwd -P )"
 	
-	ensure_manifest_file
+	ensure_template_file
 	ensure_output_file
 	
 	local commit_message="$(get_commit_message)"
@@ -13,7 +13,7 @@ main() {
 	publish_manifest "$commit_message"
 }
 
-ensure_manifest_file() {
+ensure_template_file() {
 	TEMPLATE_FILE="${TEMPLATE_FILE:-${source_dir}/manifest.template}"
 }
 
@@ -23,7 +23,7 @@ ensure_output_file() {
 }
 
 get_commit_message() {
-	[[ -f $OUTPUT_FILE ]] && { echo "update manifest" } || { echo "add manifest file" }
+	[[ -f $OUTPUT_FILE ]] && { echo "update manifest"; } || { echo "add manifest file"; }
 }
 
 render_manifest_template() {
