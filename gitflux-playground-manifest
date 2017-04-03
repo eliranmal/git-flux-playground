@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-GF_VERSION="1.0.1"
+GF_VERSION=@@VERSION@@
 
-GF_VERSION=$version
+GF_VERSION=1.0.1
