@@ -37,11 +37,17 @@ render_template() {
 	eval "echo \"$(cat $1)\""
 }
 
+has_changed() {
+	[[ $(git diff-index --name-only HEAD --) =~ $OUTPUT_FILE ]]
+}
+
 publish_manifest() {
 	local commit_message="$1"
-	git add ${OUTPUT_FILE}
-	git commit --only -m "$commit_message" -- ${OUTPUT_FILE}
-	git push origin
+	echo "has changed: $(has_changed)"
+	
+#	git add ${OUTPUT_FILE}
+#	git commit --only -m "$commit_message" -- ${OUTPUT_FILE}
+#	git push origin
 }
 
 
