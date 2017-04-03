@@ -5,23 +5,25 @@ main() {
 	local source_dir="$( cd "$(dirname "${BASH_SOURCE}")" ; pwd -P )"
 	local root_dir=${source_dir}/..
 	
-	local manifest_file=${root_dir}/git-flux-playground-manifest
-	local version="$(cat ${root_dir}/VERSION)"
-
-	local commit_message="$(get_commit_message "$manifest_file")"
-
-	render_manifest_template "${source_dir}/manifest.tmpl" "$manifest_file" "$version"
 	
-	if [[ $(has_changed "$manifest_file") ]]; then
-		publish_manifest "$manifest_file" "$commit_message"
-	fi
+	ensure_output_file
+
+	local commit_message="$(get_commit_message)"
+	echo "commit message: $commit_message"
+
+	render_manifest_template
+	
+	publish_manifest "$commit_message"
 
 }
 
+ensure_output_file() {
+	OUTPUT_FILE="${OUTPUT_FILE:-${source_dir}/../MANIFEST}"
+}
+
 get_commit_message() {
-	local manifest_file="$1"
 	local commit_message
-	if [[ ! -f $manifest_file ]]; then
+	if [[ ! -f $OUTPUT_FILE ]]; then
 		commit_message="add manifest file"
 	else
 		commit_message="update manifest"
@@ -30,15 +32,20 @@ get_commit_message() {
 }
 
 render_manifest_template() {
-	local template_file="$1"; local output_file="$2"; local version="$3"
-	sed -e 's,@@VERSION@@,'"$version"',g' ${template_file} > ${output_file}
+	local template_file=${source_dir}/manifest.tmpl
+	# declare manifest properties
+	local version="$(cat ${source_dir}/../VERSION)"
+	# inject values into placeholders and write to output file
+	sed -e 's,@@VERSION@@,'"$version"',g' ${template_file} > ${OUTPUT_FILE}
 }
 
 publish_manifest() {
-	local manifest_file="$1"; local commit_message="$2"
-	git add ${manifest_file}
-	git commit --only -m "$commit_message" -- ${manifest_file}
-	git push origin
+	local commit_message="$1"
+	if [[ $(has_changed "$OUTPUT_FILE") ]]; then
+		git add ${OUTPUT_FILE}
+		git commit --only -m "$commit_message" -- ${OUTPUT_FILE}
+		git push origin
+	fi
 }
 
 has_changed() {
