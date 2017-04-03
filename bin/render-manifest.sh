@@ -38,16 +38,21 @@ render_template() {
 }
 
 has_changed() {
-	[[ $(git diff-index --name-only HEAD --) =~ $OUTPUT_FILE ]]
+	[[ $(git diff-index --name-only HEAD --) =~ $(basename "$1") ]]
 }
 
 publish_manifest() {
 	local commit_message="$1"
-	echo "has changed: $(has_changed)"
 	
 #	git add ${OUTPUT_FILE}
 #	git commit --only -m "$commit_message" -- ${OUTPUT_FILE}
 #	git push origin
+
+	if has_changed "$OUTPUT_FILE"; then
+		echo "has changed"
+	else
+		echo "not changed"
+	fi
 }
 
 
