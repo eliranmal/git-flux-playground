@@ -1,5 +1,3 @@
 #!/usr/bin/env bash
 
-GF_VERSION=@@VERSION@@
-
-GF_VERSION=1.0.1
+GIT_FLUX_VERSION=1.0.1
