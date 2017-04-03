@@ -41,11 +41,11 @@ render_manifest_template() {
 
 publish_manifest() {
 	local commit_message="$1"
-	if [[ $(has_changed "$OUTPUT_FILE") ]]; then
-		git add ${OUTPUT_FILE}
-		git commit --only -m "$commit_message" -- ${OUTPUT_FILE}
-		git push origin
-	fi
+	git add ${OUTPUT_FILE}
+	git commit --only -m "$commit_message" -- ${OUTPUT_FILE}
+	git push origin
+#	if [[ $(has_changed "$OUTPUT_FILE") ]]; then
+#	fi
 }
 
 has_changed() {
