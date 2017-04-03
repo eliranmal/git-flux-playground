@@ -27,7 +27,7 @@ get_commit_message() {
 }
 
 render_manifest_template() {
-	# declare manifest properties
+	# declare manifest placeholders as variables
 	local version="$(cat ${source_dir}/../VERSION)"
 	# inject values into placeholders and write to output file
 	render_template ${TEMPLATE_FILE} > ${OUTPUT_FILE}
@@ -37,22 +37,17 @@ render_template() {
 	eval "echo \"$(cat $1)\""
 }
 
-has_changed() {
-	[[ $(git diff-index --name-only HEAD --) =~ $(basename "$1") ]]
-}
-
 publish_manifest() {
 	local commit_message="$1"
-	
-#	git add ${OUTPUT_FILE}
-#	git commit --only -m "$commit_message" -- ${OUTPUT_FILE}
-#	git push origin
-
+	git add ${OUTPUT_FILE}
 	if has_changed "$OUTPUT_FILE"; then
-		echo "has changed"
-	else
-		echo "not changed"
+		git commit --only -m "$commit_message" -- ${OUTPUT_FILE}
+		git push origin
 	fi
+}
+
+has_changed() {
+	[[ $(git diff-index --name-only HEAD --) =~ $(basename "$1") ]]
 }
 
 
