@@ -1,3 +1,4 @@
 # git-flux-playground
 
-barrrrrrrrrrrr
+foo
+bar
